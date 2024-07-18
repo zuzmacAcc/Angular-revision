@@ -11,10 +11,9 @@ import { NgIf } from "@angular/common";
   template: `
     <app-submit-text (submitText)="addTask($event)" />
     <app-tasks-list *ngIf="!loading"  class="block mt-4" [tasks]="tasks" />
-    <p *ngIf="loading; else loadingTemplate" >Loading...</p>
 
     <ng-template #loadingTemplate>
-      <p>hej</p>
+      <p>Loading...</p>
     </ng-template>
     
   `,
