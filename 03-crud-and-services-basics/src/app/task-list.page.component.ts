@@ -25,11 +25,21 @@ type ErrorState = {
   error: ListFetchingError;
 };
 
-const URL = "http://localhost:3000";
-
 type ComponentListState = IdleState | LoadingState | SuccessState | ErrorState;
 
+const URL = "http://localhost:3000";
+
+async function wait(time = 1200) {
+  await new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(null);
+    }, time);
+  });
+}
+
 async function getTasks() {
+  await wait();
+
   return fetch(`${URL}/tasks`).then<Task[] | ListFetchingError>((response) => {
     if (response.ok) {
       return response.json();
@@ -40,6 +50,8 @@ async function getTasks() {
 }
 
 async function addTask(name: string) {
+  await wait();
+
   return fetch(`${URL}/tasks`, {
     method: "POST",
     headers: {
@@ -82,19 +94,17 @@ export class TaskListPageComponent {
   constructor() {
     this.listState = { state: "loading" };
     getTasks().then((response) => {
-      setTimeout(() => {
-        if (Array.isArray(response)) {
-          this.listState = {
-            state: "success",
-            results: response,
-          };
-        } else {
-          this.listState = {
-            state: "error",
-            error: response,
-          };
-        }
-      }, 1200);
+      if (Array.isArray(response)) {
+        this.listState = {
+          state: "success",
+          results: response,
+        };
+      } else {
+        this.listState = {
+          state: "error",
+          error: response,
+        };
+      }
     });
   }
 
