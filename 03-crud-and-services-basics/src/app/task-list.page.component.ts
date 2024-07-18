@@ -1,9 +1,9 @@
-import { Component } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { TasksListComponent } from "./tasks-list.component";
 import { SubmitTextComponent } from "./submit-text.component";
 import { Task } from "./Task";
 import { NgIf } from "@angular/common";
-import { addTask, getTasks } from "./tasks.service";
+import { TasksService } from "./tasks.service";
 import { ComponentListState } from "./list-state.type";
 
 @Component({
@@ -26,9 +26,12 @@ import { ComponentListState } from "./list-state.type";
 export class TaskListPageComponent {
   listState: ComponentListState<Task> = { state: "idle" };
 
-  constructor() {
+  // private tasksService = inject(TasksService);
+  constructor(private tasksService: TasksService) {}
+
+  ngOnInit() {
     this.listState = { state: "loading" };
-    getTasks().then((response) => {
+    this.tasksService.getAll().then((response) => {
       if (Array.isArray(response)) {
         this.listState = {
           state: "success",
@@ -44,7 +47,7 @@ export class TaskListPageComponent {
   }
 
   addTask(name: string, tasks: Task[]) {
-    addTask(name).then((response) => {
+    this.tasksService.add(name).then((response) => {
       if ("id" in response) {
         this.listState = {
           state: "success",
