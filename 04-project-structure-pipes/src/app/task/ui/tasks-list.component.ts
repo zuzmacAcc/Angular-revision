@@ -25,15 +25,15 @@ import { AutosizeTextareaComponent } from "@ui/autosize-textarea.component";
           <button
             class="w-full"
             (click)="handleSingleClick(task)"
-            (dblclick)="switchToEditMode()"
+            (dblclick)="switchToEditMode(task)"
           >
             <header class="flex justify-end">
               <app-remove-item-button (confirm)="delete(task.id)" />
             </header>
             <section class="text-left">
               <app-autosize-textarea
-                *ngIf="editMode; else previewModeTemplate"
-                (keyup.escape)="editMode = false"
+                *ngIf="editMode && taskOnEditId == task.id; else previewModeTemplate"
+                (keyup.escape)="editMode = false; taskOnEditId = null"
                 (submitText)="updateTask(task.id, $event)"
                 [value]="task.name"
               />
@@ -60,6 +60,8 @@ export class TasksListComponent {
   removeMode = false;
   editMode = false;
 
+  taskOnEditId: number | null = null;
+
   isSingleClick = true;
 
   private tasksService = inject(TasksService);
@@ -73,6 +75,7 @@ export class TasksListComponent {
     this.tasksService.update(taskId, updatedName);
     this.tasks.find((task) => task.id === taskId)!.name = updatedName;
     this.editMode = false;
+    this.taskOnEditId = null;
   }
 
   handleSingleClick(task: Task) {
@@ -85,9 +88,10 @@ export class TasksListComponent {
     }, 150);
   }
 
-  switchToEditMode() {
+  switchToEditMode(task: Task) {
     this.isSingleClick = false;
     this.editMode = true;
+    this.taskOnEditId = task.id;
   }
 
   toggleDoneStatus(task: Task) {
