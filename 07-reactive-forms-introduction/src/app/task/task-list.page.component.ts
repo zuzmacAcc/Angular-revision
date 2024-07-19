@@ -1,3 +1,4 @@
+import { SortBy } from './../shared/enums/sort-by.enum';
 import { Component, inject } from "@angular/core";
 import { TasksListComponent } from "./ui/tasks-list.component";
 import { Task } from "./model/Task";
@@ -5,7 +6,7 @@ import { NgIf } from "@angular/common";
 import { GetAllTasksSearchParams, TasksService } from "./data-access/tasks.service";
 import { ComponentListState } from "../utils/list-state.type";
 import { SubmitTextComponent } from "@ui/submit-text.component";
-import { SORT_BY, SortBy } from "../shared/enums/sort-by.enum";
+import { SORT_BY } from "../shared/enums/sort-by.enum";
 import {
   FormControl,
   FormGroup,
@@ -13,14 +14,13 @@ import {
   ReactiveFormsModule,
 } from "@angular/forms";
 
-// export const TODO_STATUS = {
-//   ALL: "ALL",
-//   TODO: "TODO",
-//   DONE: "DONE",
-// } as const;
+export const TODO_STATUS = {
+  ALL: "ALL",
+  TODO: "TODO",
+  DONE: "DONE",
+} as const;
 
-// type TodoStatus = keyof typeof TODO_STATUS;
-type TodoStatus = "ALL" | "TODO" | "DONE";
+type TodoStatus = keyof typeof TODO_STATUS;
 
 type TasksListFiltersForm = FormGroup<{
   searchTerm: FormControl<string>;
@@ -29,6 +29,26 @@ type TasksListFiltersForm = FormGroup<{
 }>;
 
 type TasksListFiltersFormValue = ReturnType<TasksListFiltersForm["getRawValue"]>;
+
+function getAllTasksSearchParams(
+  formValue: TasksListFiltersFormValue
+): GetAllTasksSearchParams {
+  let searchParams = {
+    _sort: "createdAt",
+    _order: formValue.sortBy.toLocaleLowerCase(),
+    q: formValue.searchTerm,
+  } as GetAllTasksSearchParams;
+
+  if (formValue.status === "TODO") {
+    searchParams.done_like = "false";
+  } else if (formValue.status === "DONE") {
+    searchParams.done_like = "true";
+  } else {
+    searchParams.done_like = "";
+  }
+
+  return searchParams;
+}
 
 @Component({
   selector: "app-task-list-page",
@@ -87,9 +107,9 @@ type TasksListFiltersFormValue = ReturnType<TasksListFiltersForm["getRawValue"]>
               id="filter-status"
               class="border border-orange-400 outline-none"
             >
-              <option>-</option>
-              <option>Done</option>
-              <option>Todo</option>
+              <option [value]="statusOptions.ALL">-</option>
+              <option [value]="statusOptions.DONE">Done</option>
+              <option [value]="statusOptions.TODO">Todo</option>
             </select>
           </fieldset>
         </div>
@@ -97,14 +117,14 @@ type TasksListFiltersFormValue = ReturnType<TasksListFiltersForm["getRawValue"]>
       <div class="flex gap-12">
         <button
           class="rounded px-2 py-1 transition-colors duration-300"
-          [class.bg-green-400]="sortedBy === sortOptions.DESC"
+          [class.bg-green-400]="form.controls.sortBy.value === sortOptions.DESC"
           (click)="sort(sortOptions.DESC)"
         >
           📆🔽
         </button>
         <button
           class="rounded px-2 py-1 transition-colors duration-300"
-          [class.bg-green-400]="sortedBy === sortOptions.ASC"
+          [class.bg-green-400]="form.controls.sortBy.value === sortOptions.ASC"
           (click)="sort(sortOptions.ASC)"
         >
           📆🔼
@@ -129,59 +149,46 @@ export class TaskListPageComponent {
   form: TasksListFiltersForm = this.formBuilder.group({
     searchTerm: this.formBuilder.control<string>(""),
     sortBy: this.formBuilder.control<SortBy>("ASC"),
-    status: this.formBuilder.control<TodoStatus>("ALL"),
+    status: this.formBuilder.control<TodoStatus>(TODO_STATUS.ALL),
   });
 
   sortOptions = SORT_BY;
+  statusOptions = TODO_STATUS;
 
   sortedBy: SortBy = SORT_BY.DESC;
 
-  sort(stri: SortBy) {
-    this.sortedBy = stri;
+  sort(sort: SortBy) {
+    this.form.patchValue({
+      sortBy: sort
+    })
   }
 
   ngOnInit() {
     this.listState = { state: "loading" };
 
-    function getAllTasksSearchParams(
-      formValue: TasksListFiltersFormValue
-    ): GetAllTasksSearchParams {
-      let searchParams = {
-        _sort: "createdAt",
-        _order: formValue.sortBy.toLocaleLowerCase(),
-        q: formValue.searchTerm,
-      } as GetAllTasksSearchParams;
-
-      if (formValue.status === "TODO") {
-        searchParams.done_like = "false";
-      } else if (formValue.status === "DONE") {
-        searchParams.done_like = "true";
-      } else {
-        searchParams.done_like = "";
-      }
-
-      return searchParams;
-    }
-
     this.form.valueChanges.subscribe((value) => {
-      this.form.getRawValue;
+      this.getALlTasks(getAllTasksSearchParams(this.form.getRawValue()))
     });
 
+    this.getALlTasks(getAllTasksSearchParams(this.form.getRawValue()))
+  }
+
+  getALlTasks(searchParams: GetAllTasksSearchParams) {
     this.tasksService
-      .getAll(getAllTasksSearchParams(this.form.getRawValue()))
-      .then((response) => {
-        if (Array.isArray(response)) {
-          this.listState = {
-            state: "success",
-            results: response,
-          };
-        } else {
-          this.listState = {
-            state: "error",
-            error: response,
-          };
-        }
-      });
+    .getAll(searchParams)
+    .then((response) => {
+      if (Array.isArray(response)) {
+        this.listState = {
+          state: "success",
+          results: response,
+        };
+      } else {
+        this.listState = {
+          state: "error",
+          error: response,
+        };
+      }
+    });
   }
 
   addTask(name: string, tasks: Task[]) {
