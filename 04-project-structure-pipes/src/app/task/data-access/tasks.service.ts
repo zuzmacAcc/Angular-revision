@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
-import { Task } from "./Task";
-import { ListFetchingError } from "../utils/list-state.type";
-import { wait } from "../utils/wait";
+import { Task } from "../model/Task";
+import { ListFetchingError } from "../../utils/list-state.type";
+import { wait } from "../../utils/wait";
 
 @Injectable({
   providedIn: "root",
