@@ -4,8 +4,8 @@ import { NgFor, NgIf } from "@angular/common";
 import { NgIconComponent, provideIcons } from "@ng-icons/core";
 import { featherCalendar } from "@ng-icons/feather-icons";
 import { TasksService } from "../data-access/tasks.service";
-import { AutosizeTextareaComponent } from "@ui/autosize-textarea.component";
 import { RemoveItemButtonComponent } from "@ui/remove-item-button.component";
+import { AutosizeTextareaComponent } from "@ui/autosize-textarea.component";
 
 @Component({
   selector: "app-tasks-list",
