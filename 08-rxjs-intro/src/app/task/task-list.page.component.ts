@@ -21,7 +21,11 @@ import { getAllTasksSearchParams } from "./data-access/tasks-filters.adapter";
         listState.state === listStateValue.SUCCESS && addTask($event, listState.results)
       "
     />
-    <app-tasks-list-filters (filtersChange)="handleFiltersChange($event)" />
+    <button (click)="toggleFilters()">toggle filters</button>
+    <app-tasks-list-filters
+      *ngIf="showFilters"
+      (filtersChange)="handleFiltersChange($event)"
+    />
     <app-tasks-list
       *ngIf="listState.state === listStateValue.SUCCESS"
       class="block mt-4"
@@ -39,8 +43,14 @@ export class TaskListPageComponent {
   listState: ComponentListState<Task> = { state: LIST_STATE_VALUE.IDLE };
   listStateValue = LIST_STATE_VALUE;
 
+  showFilters = true;
+
   ngOnInit() {
     // this.getAllTasks(getAllTasksSearchParams(this.form.getRawValue()));
+  }
+
+  toggleFilters() {
+    this.showFilters = !this.showFilters;
   }
 
   handleFiltersChange(filters: TasksListFiltersFormValue): void {
