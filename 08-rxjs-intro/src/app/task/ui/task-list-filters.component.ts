@@ -8,6 +8,7 @@ import {
 import { SortBy, SORT_BY } from "src/app/shared/enums/sort-by.enum";
 import { TaskStatus, TASK_STATUS } from "../model/task-status.enum";
 import { FormValue } from "src/app/utils/form-value.type";
+import { startWith } from "rxjs";
 
 type TasksListFiltersForm = FormGroup<{
   searchTerm: FormControl<string>;
@@ -118,8 +119,9 @@ export class TasksListFiltersComponent {
   }
 
   ngOnInit() {
-    this.form.valueChanges.pipe().subscribe(() => {
+    this.form.valueChanges.pipe(startWith(this.form.value)).subscribe(() => {
       this.filtersChange.emit(this.form.getRawValue());
+      console.log(this.form.getRawValue());
     });
   }
 }
