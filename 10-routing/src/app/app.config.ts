@@ -13,19 +13,21 @@ const routes: Routes = [
   {
     path: "projects",
     component: ProjectListPageComponent,
+    title: "Projects",
   },
   {
     path: "tasks",
+    title: "Tasks",
     children: [
       {
-        path: '',
-        component: TaskListPageComponent
+        path: "",
+        component: TaskListPageComponent,
       },
       {
-        path: ':projectId',
-        component: TaskListPageComponent
+        path: ":projectId",
+        component: TaskListPageComponent,
       },
-    ]
+    ],
   },
   {
     path: "**",
