@@ -22,11 +22,10 @@ export class TasksService {
   private http = inject(HttpClient);
 
   getAll(searchParams: GetAllTasksSearchParams) {
-    const url = new URL("/tasks", this.URL);
-
-    url.search = new URLSearchParams(searchParams).toString();
-
-    return this.http.get<Task[]>(url.href);
+    return this.http.get<Task[]>(`${this.URL}/tasks`, {
+      observe: "response",
+      params: searchParams,
+    });
   }
 
   async delete(taskId: number) {

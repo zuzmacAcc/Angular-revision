@@ -53,10 +53,10 @@ export class TaskListPageComponent {
     this.tasksService
       .getAll(searchParams)
       .subscribe({
-        next: (results) => {
+        next: (response) => {
           this.listState = {
             state: LIST_STATE_VALUE.SUCCESS,
-            results: results,
+            results: response.body!,
           };
         },
         error: (err) => {
