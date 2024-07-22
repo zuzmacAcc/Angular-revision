@@ -8,7 +8,7 @@ import {
 import { SortBy, SORT_BY } from "src/app/shared/enums/sort-by.enum";
 import { TaskStatus, TASK_STATUS } from "../model/task-status.enum";
 import { FormValue } from "src/app/utils/form-value.type";
-import { startWith, Subscription } from "rxjs";
+import { debounceTime, startWith, Subscription } from "rxjs";
 
 type TasksListFiltersForm = FormGroup<{
   searchTerm: FormControl<string>;
@@ -121,14 +121,16 @@ export class TasksListFiltersComponent {
   }
 
   ngOnInit() {
-    this.formChangesSubscription = this.form.valueChanges.pipe(startWith(this.form.value)).subscribe(() => {
-      this.filtersChange.emit(this.form.getRawValue());
-      console.log(this.form.getRawValue());
-    });
+    this.formChangesSubscription = this.form.valueChanges
+      .pipe(startWith(this.form.value), debounceTime(500))
+      .subscribe(() => {
+        this.filtersChange.emit(this.form.getRawValue());
+        console.log(this.form.getRawValue());
+      });
   }
 
   ngOnDestroy() {
-    console.log('ng on destroy');
+    console.log("ng on destroy");
     this.formChangesSubscription?.unsubscribe();
   }
 }
