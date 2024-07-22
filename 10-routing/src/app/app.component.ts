@@ -1,11 +1,12 @@
 import { Component } from "@angular/core";
 import { TaskListPageComponent } from "./task/task-list.page.component";
 import { ProjectListPageComponent } from "./project/project-list.page.component";
+import { RouterOutlet } from "@angular/router";
 
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [TaskListPageComponent, ProjectListPageComponent],
+  imports: [TaskListPageComponent, ProjectListPageComponent, RouterOutlet],
   styles: [
     `
       main,
@@ -25,9 +26,10 @@ import { ProjectListPageComponent } from "./project/project-list.page.component"
       </ul>
     </nav> -->
     <main class="grid pt-4">
-      <app-project-list-page />
+      <!-- <app-project-list-page />
       <hr class="my-6" />
-      <app-task-list-page />
+      <app-task-list-page /> -->
+      <router-outlet/>
     </main>
   `,
 })
