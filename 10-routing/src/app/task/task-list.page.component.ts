@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, Input } from "@angular/core";
 import { TasksListComponent } from "./ui/tasks-list.component";
 import { Task } from "./model/Task";
 import { NgIf } from "@angular/common";
@@ -34,6 +34,8 @@ import { getAllTasksSearchParams } from "./data-access/tasks-filters.adapter";
   `,
 })
 export class TaskListPageComponent {
+  @Input() projectId?: string; //withComponentInputBinding() - app.config
+
   private tasksService = inject(TasksService);
 
   listState: ComponentListState<Task> = { state: LIST_STATE_VALUE.IDLE };
@@ -50,7 +52,11 @@ export class TaskListPageComponent {
   getAllTasks(searchParams: GetAllTasksSearchParams): void {
     this.listState = { state: LIST_STATE_VALUE.LOADING };
 
-    this.tasksService.getAll(searchParams).subscribe({
+    const source$ = this.projectId
+      ? this.tasksService.getByProjectId(this.projectId, searchParams)
+      : this.tasksService.getAll(searchParams);
+
+      source$.subscribe({
       next: (response) => {
         console.log(response.headers.get("Content-Length"));
 
