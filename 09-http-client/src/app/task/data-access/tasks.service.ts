@@ -28,16 +28,8 @@ export class TasksService {
     });
   }
 
-  async delete(taskId: number) {
-    return fetch(`${this.URL}/tasks/${taskId}`, {
-      method: "DELETE",
-    }).then<Error | undefined>((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-
-      return new Error("Cant delete task");
-    });
+ delete(taskId: number) {
+  return this.http.delete(`${this.URL}/tasks/${taskId}`);
   }
 
   update(taskId: number, payload: TaskUpdatePayload) {

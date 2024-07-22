@@ -1,13 +1,6 @@
 {
   "tasks": [
     {
-      "id": 1,
-      "name": "Angular v16 !!!",
-      "done": false,
-      "createdAt": 1693042928127,
-      "updatedAt": 1697740416385
-    },
-    {
       "id": 2,
       "name": "Learn components and more stuff",
       "done": false,
